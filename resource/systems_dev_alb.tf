@@ -26,7 +26,7 @@ resource "aws_alb" "systems-dev-gateway-alb" {
     ]
 
     access_logs {
-        bucket = aws_s3_bucket.alb.id
+        bucket = aws_s3_bucket.s3-alb.id
         prefix = "gateway-alb"
         enabled = true
     }

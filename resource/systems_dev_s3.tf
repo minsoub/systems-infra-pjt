@@ -1,30 +1,21 @@
 # s3 definition
-variable "alb_account_id" {
-  default = "my account id"
+resource "aws_s3_bucket" "s3-alb" {
+    bucket = "gateway-alb-log"
+    //policy = data.aws_iam_policy_document.allow_access_policy.json
 }
 
-resource "aws_s3_bucket" "alb" {
-    bucket = "gateway-alb-log"
-    policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::${var.alb_account_id}:root"
-            },
-            "Action": "s3:PutObject",
-            "Resource": "arn:aws:s3::gateway-alb-log/*"
-        }
-    ]
-}    
-    EOF
+resource "aws_s3_bucket_policy" "s3_alb_log_policy" {
+    depends_on = [aws_s3_bucket.s3-alb]
 
-    lifecycle_rule {
+    bucket = aws_s3_bucket.s3-alb.id
+    policy = data.aws_iam_policy_document.allow_access_policy.json
+}
+resource "aws_s3_bucket_lifecycle_configuration" "s3_lifecycle_rule" {
+    bucket = aws_s3_bucket.s3-alb.id
+    rule {
         id = "log_lifecycle"
+        status = "Enabled"
         prefix = ""
-        enabled = true
 
         transition {
             days = 30
@@ -36,5 +27,22 @@ resource "aws_s3_bucket" "alb" {
     }
     lifecycle {
         prevent_destroy = true
+    }
+}
+
+data "aws_iam_policy_document" "allow_access_policy" {
+    statement {
+        principals {
+          type    = "AWS"
+          identifiers = ["${var.my_account_id}"]
+        }
+
+        actions = [
+         "s3:PutObject",
+        ]
+        resources = [
+          aws_s3_bucket.s3-alb.arn,
+          "${aws_s3_bucket.s3-alb.arn}/*",
+        ]
     }
 }

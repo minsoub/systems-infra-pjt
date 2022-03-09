@@ -10,7 +10,7 @@ resource "aws_alb" "systems-dev-logserver-alb" {
     ]
 
     access_logs {
-        bucket = aws_s3_bucket.alb.id
+        bucket = aws_s3_bucket.s3-alb.id
         prefix = "logserver-alb"
         enabled = true
     }
