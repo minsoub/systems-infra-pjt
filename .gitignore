@@ -1,2 +1,3 @@
 resource/.terraform
 resource/.terraform.lock.hcl
+resource/.terraform/*
