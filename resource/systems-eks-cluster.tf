@@ -3,7 +3,7 @@ resource "aws_iam_role" "systems-eks-cluster-role" {
     name = "systems-eks-cluster-role"
 
     assume_role_policy = <<POLICY
-    {
+{
         "Version": "2012-10-17",
         "Statement": [
             {
@@ -14,10 +14,11 @@ resource "aws_iam_role" "systems-eks-cluster-role" {
                 "Action": "sts:AssumeRole"
             }
         ]
-    }
-    POLICY
+}
+POLICY
 }
 
+## EKS Cluster Role : AmazonEKSClusterPolicy, AmazonEKSVPCResourceController
 # 위에서 생성한 IAM Role에 policy를 추가한다.
 resource "aws_iam_role_policy_attachment" "systems-eks-cluster-AmazonEKSClusterPolicy" {
     policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
@@ -30,10 +31,10 @@ resource "aws_iam_role_policy_attachment" "systems-eks-cluster-AmazonEKSVPCResou
 }
 
 # Security Group 
-resource "aws_security_group" "systems-ekc-cluster-sg" {
-    name        = "systems-ekc-cluster-sg"
+resource "aws_security_group" "systems-eks-cluster-sg" {
+    name        = "systems-eks-cluster-sg"
     description = "Cluster communication with worker nodes"
-    vpc_id      = aws_vpc.systems_dev_vpc.id
+    vpc_id      = aws_vpc.systems_eks_vpc.id
 
     egress {
         from_port = 0
@@ -65,7 +66,7 @@ resource "aws_eks_cluster" "systems-eks-cluster" {
     enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
     vpc_config {
-        security_group_ids = [aws_security_group.systems-ekc-cluster-sg.id]
+        security_group_ids = [aws_security_group.systems-eks-cluster-sg.id]
         subnet_ids = [
             aws_subnet.systems_dev_public_subnet1.id, 
             aws_subnet.systems_dev_public_subnet2.id,

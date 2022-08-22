@@ -1,7 +1,12 @@
 
 data "aws_partition" "current" {}
+data "aws_caller_identity" "caller" {}
+# data "aws_eks_cluster" "cluster" {
+#     name = "systems-eks-cluster"
+# }
 data "tls_certificate" "cluster" {
-    url = data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer
+    #url = data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer
+    url = aws_eks_cluster.systems-eks-cluster.identity.0.oidc.0.issuer
 }
 
 locals {
@@ -123,18 +128,20 @@ resource "aws_iam_role" "eks-service-account-role" {
     }
 }
 
+# 
+
 # create the IAM OIDC provider for the cluster
 resource "aws_iam_openid_connect_provider" "eks-cluster" {
     client_id_list = ["sts.amazonaws.com"]
     thumbprint_list = [data.tls_certificate.cluster.certificates[0].sha1_fingerprint]
-    url             = data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer
+    url             = aws_eks_cluster.systems-eks-cluster.identity.0.oidc.0.issuer   # data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer
 }
 
 # service-account
 resource "kubernetes_service_account" "eks-service-account" {
     metadata {
         name = "cluster-user-account"
-        namespace = var.eks-cluster-namespace-name
+        #namespace = var.eks-cluster-namespace-name
 
         annotations = {
             "eks.amazonas.com/role-arn" = aws_iam_role.eks-service-account-role.arn
@@ -146,7 +153,7 @@ resource "kubernetes_service_account" "eks-service-account" {
 resource "kubernetes_role" "namespace-viewer" {
     metadata {
         name = "developer-viewer"
-        namespace = var.eks-cluster-namespace-name
+        #namespace = var.eks-cluster-namespace-name
     }
     rule {
         api_groups = [""]
@@ -168,7 +175,7 @@ resource "kubernetes_role" "namespace-viewer" {
 resource "kubernetes_role_binding" "namespace-viewer" {
     metadata {
         name = "developer-viewer"
-        namespace = var.eks-cluster-namespace-name
+        #namespace = var.eks-cluster-namespace-name
     }
     role_ref {
         api_group = "rbac.authorization.k8s.io"

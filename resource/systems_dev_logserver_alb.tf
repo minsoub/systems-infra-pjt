@@ -6,14 +6,15 @@ resource "aws_alb" "systems-dev-logserver-alb" {
     name = "systems-dev-logserver-alb"
     security_groups = [aws_security_group.systems-dev-logserver-alb-sg.id]
     subnets = [
+        aws_subnet.systems_dev_private_subnet1.id,
         aws_subnet.systems_dev_private_subnet2.id
     ]
 
-    access_logs {
-        bucket = aws_s3_bucket.s3-alb.id
-        prefix = "logserver-alb"
-        enabled = true
-    }
+    # access_logs {
+    #     bucket = aws_s3_bucket.s3-alb.id
+    #     prefix = "logserver-alb"
+    #     enabled = true
+    # }
 
     tags = {
         Name = "systems-dev-logserver-alb"
@@ -26,7 +27,7 @@ resource "aws_alb_target_group" "prometheus-server" {
     name = "prometheus-server-target-group"
     port = 9100
     protocol = "HTTP"
-    vpc_id = aws_vpc.systems_dev_vpc.id
+    vpc_id = aws_vpc.systems_eks_vpc.id
 
     health_check {
         interval = 30
@@ -42,7 +43,7 @@ resource "aws_alb_target_group" "grafana-server" {
     name = "grafana-server-target-group"
     port = 3000
     protocol = "HTTP"
-    vpc_id = aws_vpc.systems_dev_vpc.id
+    vpc_id = aws_vpc.systems_eks_vpc.id
 
     health_check {
         interval = 30
@@ -59,7 +60,7 @@ resource "aws_alb_target_group" "kibana-server" {
     name = "kibana-server-target-group"
     port = 5601
     protocol = "HTTP"
-    vpc_id = aws_vpc.systems_dev_vpc.id
+    vpc_id = aws_vpc.systems_eks_vpc.id
 
     health_check {
         interval = 30

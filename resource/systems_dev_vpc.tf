@@ -1,19 +1,19 @@
 // VPC
-resource "aws_vpc" "systems_dev_vpc" {
-    cidr_block = "10.10.0.0/16"
+resource "aws_vpc" "systems_eks_vpc" {
+    cidr_block = "10.2.0.0/16"
     enable_dns_hostnames = true
     enable_dns_support = true
     instance_tenancy = "default"
 
     tags = {
-        "Name" = "BithumbSystems Dev VPC"
+        "Name" = "BithumbSystems EKS VPC"
         "kubernates.io/cluster/${var.eks-cluster-name}" = "shared"
     }
 }
 
 // Default Route table
-resource "aws_default_route_table" "systems_dev_vpc" {
-    default_route_table_id = aws_vpc.systems_dev_vpc.default_route_table_id
+resource "aws_default_route_table" "systems_eks_vpc" {
+    default_route_table_id = aws_vpc.systems_eks_vpc.default_route_table_id
 
     tags = {
         Name = "default"
@@ -22,8 +22,8 @@ resource "aws_default_route_table" "systems_dev_vpc" {
 
 // Public Subnet1, Subnet2
 resource "aws_subnet" "systems_dev_public_subnet1" {
-    vpc_id = aws_vpc.systems_dev_vpc.id
-    cidr_block = "10.10.1.0/24"
+    vpc_id = aws_vpc.systems_eks_vpc.id
+    cidr_block = "10.2.1.0/24"
     map_public_ip_on_launch = true
     availability_zone = data.aws_availability_zones.available.names[0]
     tags = {
@@ -33,8 +33,8 @@ resource "aws_subnet" "systems_dev_public_subnet1" {
 }
 
 resource "aws_subnet" "systems_dev_public_subnet2" {
-    vpc_id = aws_vpc.systems_dev_vpc.id
-    cidr_block = "10.10.2.0/24"
+    vpc_id = aws_vpc.systems_eks_vpc.id
+    cidr_block = "10.2.2.0/24"
     map_public_ip_on_launch = true
     availability_zone = data.aws_availability_zones.available.names[1]
     tags = {
@@ -45,8 +45,8 @@ resource "aws_subnet" "systems_dev_public_subnet2" {
 
 // Private Subnet1, Subnet2
 resource "aws_subnet" "systems_dev_private_subnet1" {
-    vpc_id = aws_vpc.systems_dev_vpc.id
-    cidr_block = "10.10.10.0/24"
+    vpc_id = aws_vpc.systems_eks_vpc.id
+    cidr_block = "10.2.10.0/24"
     availability_zone = data.aws_availability_zones.available.names[0]
     tags = {
         Name = "private-subnet-az1"
@@ -55,8 +55,8 @@ resource "aws_subnet" "systems_dev_private_subnet1" {
 }
 
 resource "aws_subnet" "systems_dev_private_subnet2" {
-    vpc_id = aws_vpc.systems_dev_vpc.id
-    cidr_block = "10.10.11.0/24"
+    vpc_id = aws_vpc.systems_eks_vpc.id
+    cidr_block = "10.2.11.0/24"
     availability_zone = data.aws_availability_zones.available.names[1]
     tags = {
         Name = "private-subnet-az2"
@@ -66,7 +66,7 @@ resource "aws_subnet" "systems_dev_private_subnet2" {
 
 // Internet Gateway
 resource "aws_internet_gateway" "systems_dev_igw" {
-    vpc_id = aws_vpc.systems_dev_vpc.id
+    vpc_id = aws_vpc.systems_eks_vpc.id
     tags = {
         Name = "systems-dev-internet-gateway"
     }
@@ -74,7 +74,7 @@ resource "aws_internet_gateway" "systems_dev_igw" {
 
 // Route to Internet
 resource "aws_route" "systems_dev_internet_access" {
-    route_table_id = aws_vpc.systems_dev_vpc.main_route_table_id
+    route_table_id = aws_vpc.systems_eks_vpc.main_route_table_id
     destination_cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.systems_dev_igw.id
 }
@@ -94,7 +94,7 @@ resource "aws_nat_gateway" "systems_dev_nat" {
 
 // Private route table
 resource "aws_route_table" "systems_dev_private_route_table" {
-    vpc_id = aws_vpc.systems_dev_vpc.id
+    vpc_id = aws_vpc.systems_eks_vpc.id
     tags = {
         Name = "Private Route Table"
     }
@@ -110,12 +110,12 @@ resource "aws_route" "systems_dev_private_route" {
 // Main Route Table -> Public Subnet
 resource "aws_route_table_association" "systems_dev_public_subnet1_assocation" {
     subnet_id = aws_subnet.systems_dev_public_subnet1.id
-    route_table_id = aws_vpc.systems_dev_vpc.main_route_table_id
+    route_table_id = aws_vpc.systems_eks_vpc.main_route_table_id
 }
 
 resource "aws_route_table_association" "systems_dev_public_subnet2_assocation" {
     subnet_id = aws_subnet.systems_dev_public_subnet2.id
-    route_table_id = aws_vpc.systems_dev_vpc.main_route_table_id
+    route_table_id = aws_vpc.systems_eks_vpc.main_route_table_id
 }
 
 // Private Route Table -> Private Subnet
@@ -131,7 +131,7 @@ resource "aws_route_table_association" "systems_dev_private_subnet2_assocation" 
 
 // Default Security Group
 resource "aws_default_security_group" "systems_dev_default_sg" {
-    vpc_id = aws_vpc.systems_dev_vpc.id
+    vpc_id = aws_vpc.systems_eks_vpc.id
 
     ingress {
         protocol = -1
@@ -152,7 +152,7 @@ resource "aws_default_security_group" "systems_dev_default_sg" {
 }
 
 resource "aws_default_network_acl" "systems_dev_default_acl" {
-    default_network_acl_id = aws_vpc.systems_dev_vpc.default_network_acl_id
+    default_network_acl_id = aws_vpc.systems_eks_vpc.default_network_acl_id
 
     ingress {
         protocol = -1
@@ -179,7 +179,7 @@ resource "aws_default_network_acl" "systems_dev_default_acl" {
 
 // Network ACL form public subnets
 resource "aws_network_acl" "systems_dev_public_acl" {
-    vpc_id = aws_vpc.systems_dev_vpc.id
+    vpc_id = aws_vpc.systems_eks_vpc.id
     subnet_ids  = [
         aws_subnet.systems_dev_public_subnet1.id,
         aws_subnet.systems_dev_public_subnet2.id,
@@ -191,7 +191,8 @@ resource "aws_network_acl" "systems_dev_public_acl" {
 }
 
 // Network ACL Rule
-// 80,443,22, ephemeral port open (inbound/outbound)
+// 80,443,22, ephemeral port open (inbound/outbound) => 외부
+// 추가 port : 8080, 9090, 3000, 27017, 6379   => 내부
 resource "aws_network_acl_rule" "systems_dev_public_ingress80" {
     network_acl_id = aws_network_acl.systems_dev_public_acl.id
     rule_number = 100
@@ -253,7 +254,7 @@ resource "aws_network_acl_rule" "systems_dev_public_egress22" {
     rule_action = "allow"
     egress = true
     protocol = "tcp"
-    cidr_block = aws_vpc.systems_dev_vpc.cidr_block
+    cidr_block = aws_vpc.systems_eks_vpc.cidr_block
     from_port = 22
     to_port = 22
 }
@@ -282,7 +283,7 @@ resource "aws_network_acl_rule" "systems_dev_public_egress_ephemeral" {
 
 // Network ACL for Private Subnets
 resource "aws_network_acl" "systems_dev_private_acl" {
-    vpc_id = aws_vpc.systems_dev_vpc.id
+    vpc_id = aws_vpc.systems_eks_vpc.id
     subnet_ids = [
         aws_subnet.systems_dev_private_subnet1.id,
         aws_subnet.systems_dev_private_subnet2.id,
@@ -300,7 +301,7 @@ resource "aws_network_acl_rule" "systems_dev_private_ingress_vpc" {
     rule_action = "allow"
     egress = false
     protocol = -1
-    cidr_block = aws_vpc.systems_dev_vpc.cidr_block
+    cidr_block = aws_vpc.systems_eks_vpc.cidr_block
     from_port = 0
     to_port = 0
 }
@@ -311,7 +312,7 @@ resource "aws_network_acl_rule" "systems_dev_private_egress_vpc" {
     rule_action = "allow"
     egress = true
     protocol = -1
-    cidr_block = aws_vpc.systems_dev_vpc.cidr_block
+    cidr_block = aws_vpc.systems_eks_vpc.cidr_block
     from_port = 0
     to_port = 0
 }

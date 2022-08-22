@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 data "aws_availability_zones" "available" {
-    exclude_names = ["ap-northeast-2b", "ap-northeast-2d"]
+    exclude_names = ["ap-northeast-2b", "ap-northeast-2d", ]
 }
 
 data "aws_ami" "amazon_linux" {

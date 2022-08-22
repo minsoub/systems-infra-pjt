@@ -4,7 +4,7 @@
 resource "aws_security_group" "systems_dev_bastion_sg" {
     name = "bastion_instance_sg"
     description = "Security group for bastion instance"
-    vpc_id = aws_vpc.systems_dev_vpc.id
+    vpc_id = aws_vpc.systems_eks_vpc.id
 
     ingress {
         from_port = 22
@@ -30,7 +30,7 @@ resource "aws_security_group" "systems_dev_bastion_sg" {
 resource "aws_instance" "systems_dev_bastion_instance" {
     ami = data.aws_ami.amazon_linux.id
     availability_zone = aws_subnet.systems_dev_public_subnet1.availability_zone
-    instance_type = "t4g.large"
+    instance_type = "c5.2xlarge"
     key_name = "systems_ec2_auth_key"
     vpc_security_group_ids = [
         aws_default_security_group.systems_dev_default_sg.id,
@@ -40,7 +40,7 @@ resource "aws_instance" "systems_dev_bastion_instance" {
         delete_on_termination = true
         iops = 150
         volume_size = 100
-        volume_type = "gp2"
+        #volume_type = "gp2"
     }
     subnet_id = aws_subnet.systems_dev_public_subnet1.id
     associate_public_ip_address = true

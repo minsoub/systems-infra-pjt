@@ -2,7 +2,7 @@
 
 # alb security group (for gateway api server)
 resource "aws_security_group" "systems-dev-gateway-alb-sg" {
-  vpc_id = aws_vpc.systems_dev_vpc.id
+  vpc_id = aws_vpc.systems_eks_vpc.id
 
   ingress {
     from_port   = 80
@@ -34,7 +34,7 @@ resource "aws_security_group" "systems-dev-gateway-alb-sg" {
 
 # alb security group (for log server)
 resource "aws_security_group" "systems-dev-logserver-alb-sg" {
-  vpc_id = aws_vpc.systems_dev_vpc.id
+  vpc_id = aws_vpc.systems_eks_vpc.id
 
   ingress {
     from_port   = 9100

@@ -1,6 +1,6 @@
 # s3 definition
 resource "aws_s3_bucket" "s3-alb" {
-    bucket = "gateway-alb-log"
+    bucket = "systems-gateway-alb-log"
     //policy = data.aws_iam_policy_document.allow_access_policy.json
 }
 
@@ -26,7 +26,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "s3_lifecycle_rule" {
         }
     }
     lifecycle {
-        prevent_destroy = true
+        prevent_destroy = false
     }
 }
 
@@ -38,11 +38,11 @@ data "aws_iam_policy_document" "allow_access_policy" {
         }
 
         actions = [
-         "s3:PutObject",
+         "s3:PutObject", "s3:GetObject"
         ]
         resources = [
           aws_s3_bucket.s3-alb.arn,
-          "${aws_s3_bucket.s3-alb.arn}/*",
+          "${aws_s3_bucket.s3-alb.arn}/logserver-alb/*",
         ]
     }
 }
