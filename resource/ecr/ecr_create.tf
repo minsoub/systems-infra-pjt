@@ -197,3 +197,78 @@ resource "aws_ecr_repository" "cpc-mng-web-prod-repo" {
         scan_on_push = true
     }
 }
+
+#######################################################################
+# 공지 내재화 프로젝트 ECR 레포지토리 생성
+# Repository Name : cms-app-web-dev-repo 
+resource "aws_ecr_repository" "cms-app-web-dev-repo" {
+    name                 = "cms-app-web-dev-repo"
+    image_tag_mutability = "MUTABLE"
+
+    image_scanning_configuration {
+        scan_on_push = true
+    }
+}
+# Repository Name : cms-app-api-dev-repo
+resource "aws_ecr_repository" "cms-app-api-dev-repo" {
+    name                 = "cms-app-api-dev-repo"
+    image_tag_mutability = "MUTABLE"
+
+    image_scanning_configuration {
+        scan_on_push = true
+    }
+}
+# Repository Name : cms-gateway-api-dev-repo
+resource "aws_ecr_repository" "cms-gateway-api-dev-repo" {
+    name                 = "cms-gateway-api-dev-repo"
+    image_tag_mutability = "MUTABLE"
+
+    image_scanning_configuration {
+        scan_on_push = true
+    }
+}
+# Repository Name : cms-mng-api-dev-repo
+resource "aws_ecr_repository" "cms-mng-api-dev-repo" {
+    name                 = "cms-mng-api-dev-repo"
+    image_tag_mutability = "MUTABLE"
+
+    image_scanning_configuration {
+        scan_on_push = true
+    }
+}
+# Repository Name : cms-batch-api-dev-repo
+resource "aws_ecr_repository" "cms-batch-api-dev-repo" {
+    name                 = "cms-batch-api-dev-repo"
+    image_tag_mutability = "MUTABLE"
+
+    image_scanning_configuration {
+        scan_on_push = true
+    }
+}
+# Repository Name : internal-gateway-api-dev-repo
+resource "aws_ecr_repository" "internal-gateway-api-dev-repo" {
+    name                 = "internal-gateway-api-dev-repo"
+    image_tag_mutability = "MUTABLE"
+
+    image_scanning_configuration {
+        scan_on_push = true
+    }
+}
+# Repository Name : external-gateway-api-dev-repo
+resource "aws_ecr_repository" "external-gateway-api-dev-repo" {
+    name                 = "external-gateway-api-dev-repo"
+    image_tag_mutability = "MUTABLE"
+
+    image_scanning_configuration {
+        scan_on_push = true
+    }
+}
+# Repository Name : inner-gateway-api-dev-repo
+resource "aws_ecr_repository" "inner-gateway-api-dev-repo" {
+    name                 = "innert-gateway-api-dev-repo"
+    image_tag_mutability = "MUTABLE"
+
+    image_scanning_configuration {
+        scan_on_push = true
+    }
+}
